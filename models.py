@@ -1,9 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey, func, Boolean
 from sqlalchemy.orm import relationship, backref
-
 import db
-
-
 
 class User(db.Base):
     __tablename__ = 'users'
@@ -32,9 +29,6 @@ class User(db.Base):
     def __str__(self):
         return f'<User {self.username}>'
 
-
-
-
 class Ingredient(db.Base):
     __tablename__ = 'ingredients'
 
@@ -51,9 +45,6 @@ class Ingredient(db.Base):
 
     def __str__(self):
         return f'<Ingredient {self.name}, Type: {self.type}>'
-
-
-
 
 class Cocktail(db.Base):
     __tablename__ = 'cocktails'
@@ -80,9 +71,6 @@ class Cocktail(db.Base):
     def __str__(self):
         return f'<Cocktail {self.name}>'
 
-
-
-
 class Dish(db.Base):
     __tablename__ = 'dishes'
 
@@ -106,8 +94,6 @@ class Dish(db.Base):
 
     def __str__(self):
         return f'<Dish {self.name}>'
-
-
 
 class Favorite(db.Base):
     __tablename__ = 'favorites'
@@ -135,8 +121,6 @@ class Favorite(db.Base):
     def __str__(self):
         return f'<Favorite User: {self.user_id}, Cocktail: {self.cocktail_id}, Dish: {self.dish_id}>'
 
-
-
 class Pairing(db.Base):
     __tablename__ = 'pairings'
 
@@ -163,8 +147,6 @@ class Pairing(db.Base):
     def __str__(self):
         return f'<Pairing User: {self.user_id}, Cocktail: {self.cocktail_id}, Dish: {self.dish_id}>'
 
-
-
 class Post(db.Base):
     __tablename__ = 'posts'
 
@@ -182,9 +164,6 @@ class Post(db.Base):
 
     def __str__(self):
         return f'<Post User: {self.user_id}, Content: {self.content[:20]}>'
-
-
-
 
 class Comment(db.Base):
     __tablename__ = 'comments'
@@ -209,9 +188,6 @@ class Comment(db.Base):
     def __str__(self):
         return f'<Comment User: {self.user_id}, Post: {self.post_id}, Content: {self.content[:20]}>'
 
-
-
-
 class Chat(db.Base):
     __tablename__ = 'chats'
 
@@ -226,10 +202,6 @@ class Chat(db.Base):
 
     def __str__(self):
         return f'<Chat {self.name_chat}>'
-
-
-
-
 
 class ChatParticipant(db.Base):
     __tablename__ = 'chat_participants'
@@ -247,9 +219,6 @@ class ChatParticipant(db.Base):
 
     def __str__(self):
         return f'<ChatParticipant Chat: {self.chat_id}, User: {self.user_id}>'
-
-
-
 
 class Message(db.Base):
     __tablename__ = 'messages'
@@ -271,8 +240,6 @@ class Message(db.Base):
 
     def __str__(self):
         return f'<Message Chat: {self.chat_id}, User: {self.user_id}, Content: {self.content[:20]}>'
-
-
 
 class Notification(db.Base):
     __tablename__ = 'notifications'
@@ -296,9 +263,6 @@ class Notification(db.Base):
     def __str__(self):
         return f'<Notification User: {self.user_id}, Type: {self.type}>'
 
-
-
-
 class Follow(db.Base):
     __tablename__ = 'follows'
 
@@ -316,9 +280,6 @@ class Follow(db.Base):
 
     def __str__(self):
         return f'<Follow Follower: {self.follower_id}, Following: {self.followed_id}>'
-
-
-
 
 db.Base.metadata.create_all(db.engine)
 
