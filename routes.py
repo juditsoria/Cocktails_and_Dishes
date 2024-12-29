@@ -11,6 +11,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 api = Blueprint('api', __name__)
 
+@api.route('/test')
+def test():
+    return {"message": "Hello from Flask"}
 
 # Endpoints sobre usuarios
 @api.route("/users", methods=["GET"])
