@@ -3,6 +3,13 @@ Cocktails Web App
 Descripción
 
 Proyecto dedicado a la creación de una aplicación web enfocada en el maridaje y los cócteles. Este proyecto se centra en ofrecer información detallada sobre cócteles y su combinación con alimentos, así como una experiencia de usuario fluida y moderna.
+Imagenes:
+- Landing page:
+  ![image](https://github.com/user-attachments/assets/aaf2af40-ff5e-4c1d-aa4e-adb76a6cf5a1)
+
+  - Cócteles: (Al darle al botón de ver más cócteles se generan nuevos)
+    ![image](https://github.com/user-attachments/assets/aa368130-9729-4a68-9685-cb3c6e504121)
+    
 
 Tecnologías Utilizadas
 
@@ -95,12 +102,5 @@ python app.py
 Contribuciones
 
 Si deseas contribuir a este proyecto, por favor crea un fork del repositorio, realiza tus cambios en una rama nueva, y envía un pull request.
-Imagenes:
-- Landing page:
-  ![image](https://github.com/user-attachments/assets/aaf2af40-ff5e-4c1d-aa4e-adb76a6cf5a1)
-
-  - Cócteles: (Al darle al botón de ver más cócteles se generan nuevos)
-    ![image](https://github.com/user-attachments/assets/aa368130-9729-4a68-9685-cb3c6e504121)
-    
 
 
