@@ -1,9 +1,6 @@
-"""
-Este módulo se encarga de iniciar el servidor API, cargar la base de datos y agregar los endpoints.
-"""
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, Blueprint
 import db
-from models import User, Ingredient, Cocktail, Dish, Favorite, Pairing
+from models import User, Cocktail, Dish, Favorite, Pairing
 from werkzeug.security import generate_password_hash
 import logging
 
@@ -89,68 +86,6 @@ def delete_user(user_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-# Endpoints sobre ingredientes
-@api.route("/ingredients", methods=["GET"])
-def get_ingredients():
-    ingredients = Ingredient.query.all()
-    return jsonify([ingredient.serialize() for ingredient in ingredients])
-
-@api.route("/ingredient/<int:Ingredient_id>", methods=["GET"])
-def get_ingredient(Ingredient_id):
-    ingredient = Ingredient.query.get_or_404(Ingredient_id)
-    return jsonify(ingredient.serialize())
-
-@api.route("/ingredient", methods=["POST"])
-def create_ingredient():
-    data = request.json
-    if not data:
-        return jsonify({"error": "No se proporcionaron datos de entrada."}), 400
-
-    ingredient_name = data.get("name")
-    if not ingredient_name:
-        return jsonify({"error": "El nombre del ingrediente es obligatorio."}), 400
-
-    new_ingredient = Ingredient(
-        name=data.get("name"),
-        type=data.get("type")
-    )
-
-    db.session.add(new_ingredient)
-    db.session.commit()
-    return jsonify(new_ingredient.serialize()), 201
-
-@api.route("/ingredient/<int:Ingredient_id>", methods=["PUT"])
-def update_ingredient(Ingredient_id):
-    data = request.json
-    if not data:
-        return jsonify({"error": "No se proporcionaron datos de entrada."}), 400
-
-    ingredient = Ingredient.query.get(Ingredient_id)
-    if not ingredient:
-        return jsonify({"error": "Ingrediente no encontrado"}), 404
-
-    ingredient.name = data.get("name", ingredient.name)
-
-    try:
-        db.session.commit()
-        return jsonify({"msg": "Ingrediente actualizado correctamente"}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
-
-@api.route("/ingredient/<int:Ingredient_id>", methods=["DELETE"])
-def delete_ingredient(Ingredient_id):
-    ingredient = Ingredient.query.get(Ingredient_id)
-    if not ingredient:
-        return jsonify({"error": "Ingrediente no encontrado"}), 404
-
-    try:
-        db.session.delete(ingredient)
-        db.session.commit()
-        return jsonify({"msg": "Ingrediente eliminado correctamente"}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
 
 # endpoints cocktails
 @api.route("/cocktails", methods=["GET"])
@@ -169,6 +104,7 @@ def get_cocktail(Cocktail_id):
 def create_cocktail():
     # Busca la data
     data = request.json
+    print("Datos recibidos:", data)
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
 
@@ -181,25 +117,33 @@ def create_cocktail():
     # Verificaciones de campos requeridos
     if not cocktail_name:
         return jsonify({"Error": "El nombre del cóctel es obligatorio."}), 400
-    if preparation_steps is None:
+    if not preparation_steps:
         return jsonify({"Error": "Los pasos de preparación son obligatorios."}), 400
-    if flavor_profile not in ['sweet', 'sour', 'bitter']:
-        return jsonify({"Error": "El perfil de sabor debe ser válido."}), 400
-    if user_id is None:
-        return jsonify({"Error": "El ID del usuario es obligatorio."}), 400
+    if not flavor_profile:
+        return jsonify({"Error": "El perfil de sabor es obligatorio."}), 400
+    if not user_id:
+        return jsonify({"Error": "El ID de usuario es obligatorio."}), 400
 
-    # Nuevo cóctel
-    new_cocktail = Cocktail(
-        name=cocktail_name,
-        preparation_steps=preparation_steps,
-        flavor_profile=flavor_profile,
-        user_id=user_id
-    )
+    try:
+        # Nuevo cóctel
+        new_cocktail = Cocktail(
+            name=cocktail_name,
+            preparation_steps=preparation_steps,
+            flavor_profile=flavor_profile,
+            user_id=user_id
+        )
 
-    db.session.add(new_cocktail)
-    db.session.commit()
+        db.session.add(new_cocktail)
+        db.session.commit()
 
-    return jsonify(new_cocktail.serialize()), 201
+        return jsonify(new_cocktail.serialize()), 201
+
+    except Exception as e:
+        # Maneja errores al guardar el cóctel en la base de datos
+        print("Error al guardar el cóctel:", e)
+        db.session.rollback()
+        return jsonify({"Error": f"Error al guardar el cóctel: {str(e)}"}), 500
+
 
 @api.route("/cocktail/<int:Cocktail_id>", methods=["PUT"])
 def update_cocktail(Cocktail_id):

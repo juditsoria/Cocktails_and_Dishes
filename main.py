@@ -1,13 +1,7 @@
 from flask_cors import CORS
 import db
-from flask import Flask, render_template, request, redirect, url_for
-import models
-from dotenv import load_dotenv
-import os
+from flask import Flask
 from routes import api
-
-load_dotenv()  # Cargar el archivo .env
-backend_url = os.getenv('BACKEND_URL')
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3001"}})
