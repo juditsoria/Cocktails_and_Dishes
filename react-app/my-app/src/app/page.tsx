@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 
-import WelcomeSection from "./components/welcome.tsx"
+import WelcomeSection from "./components/welcome"
 
 const Page = () => {
   return (

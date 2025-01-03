@@ -12,7 +12,9 @@
     "bootstrap": "^5.3.3",
     "bootswatch": "^5.3.3",
     "next": "15.1.3",
+    "next-cloudinary": "^6.16.0",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.7",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {

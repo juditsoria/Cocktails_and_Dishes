@@ -50,10 +50,13 @@ const Cocktails = () => {
     fetchCocktails();
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setCustomCocktail((prev) => ({ ...prev, [name]: value }));
   };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +65,7 @@ const Cocktails = () => {
       name: customCocktail.name,
       preparation_steps: customCocktail.preparation_steps, // Usamos preparation_steps ahora
       flavor_profile: customCocktail.flavor_profile,
+      url_image: customCocktail.image,
       user_id: 2,
       // advertencia!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // esto modificarlo mas adelante cuando se cree el login y el registr!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -87,6 +91,7 @@ const Cocktails = () => {
           name: '',
           preparation_steps: '',
           flavor_profile: 'sweet',
+          image: '',
         });
         alert('Cóctel guardado correctamente');
         router.push('/favorites');
@@ -104,7 +109,6 @@ const Cocktails = () => {
   return (
     <div className="container mt-5">
       <div className="row">
-        {/* Card del cóctel actual */}
         <div className="col-md-6">
           {error && <p>{error}</p>}
           <div className="mb-3">
