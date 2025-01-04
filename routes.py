@@ -91,7 +91,7 @@ def delete_user(user_id):
 @api.route("/cocktails", methods=["GET"])
 def get_cocktails():
     # Obtiene todos los cócteles
-    cocktails = Cocktail.query.all()
+    cocktails = db.session.query(Cocktail).all()
     return jsonify([cocktail.serialize() for cocktail in cocktails])
 
 @api.route("/cocktail/<int:Cocktail_id>", methods=["GET"])

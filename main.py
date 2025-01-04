@@ -4,7 +4,7 @@ from flask import Flask
 from routes import api
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3001"}})
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 
 # Registra el Blueprint
