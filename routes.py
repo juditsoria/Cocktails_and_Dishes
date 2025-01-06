@@ -3,6 +3,8 @@ import db
 from models import User, Cocktail, Dish, Favorite, Pairing
 from werkzeug.security import generate_password_hash
 import logging
+import cloudinary.uploader
+import cloudinary
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -11,6 +13,25 @@ api = Blueprint('api', __name__)
 @api.route('/test')
 def test():
     return {"message": "Hello from Flask"}
+
+# endpoint para subir las imagenes de los cocktails
+@api.route('/api/upload', methods=['POST'])
+def upload_image():
+    file = request.files.get('file')
+    if not file:
+        return jsonify({'error': 'No file uploaded'}), 400
+    
+    # Si el archivo está presente, imprime su nombre y tipo
+    print(f"Archivo recibido: {file.filename}, Tipo: {file.mimetype}")
+    
+    # Lógica para manejar el archivo
+    return jsonify({'message': 'Archivo recibido correctamente'})
+    
+    try:
+        upload_result = cloudinary.uploader.upload(file)
+        return jsonify({'url': upload_result['url']})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Endpoints sobre usuarios
 @api.route("/users", methods=["GET"])
@@ -55,14 +76,12 @@ def update_user(user_id):
     if not user:
         return jsonify({"error": "Usuario no encontrado"}), 404
 
-    # Actualizar los campos solo si están presentes en la solicitud
     user.name = data.get("name", user.name)
     user.username = data.get("username", user.username)
     user.email = data.get("email", user.email)
 
-    # Si se proporciona una nueva contraseña, actualizarla
     new_password = data.get("password")
-    if new_password is not None:  # Cambiado de if new_password: a if new_password is not None:
+    if new_password is not None: 
         user.password = generate_password_hash(new_password)
 
     try:
@@ -90,31 +109,26 @@ def delete_user(user_id):
 # endpoints cocktails
 @api.route("/cocktails", methods=["GET"])
 def get_cocktails():
-    # Obtiene todos los cócteles
     cocktails = db.session.query(Cocktail).all()
     return jsonify([cocktail.serialize() for cocktail in cocktails])
 
 @api.route("/cocktail/<int:Cocktail_id>", methods=["GET"])
 def get_cocktail(Cocktail_id):
-    # Obtiene el cóctel por el id
     cocktail = Cocktail.query.get_or_404(Cocktail_id)
     return jsonify(cocktail.serialize())
 
 @api.route("/cocktail", methods=["POST"])
 def create_cocktail():
-    # Busca la data
     data = request.json
     print("Datos recibidos:", data)
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
 
-    # Obtiene los campos necesarios
     cocktail_name = data.get("name")
     preparation_steps = data.get("preparation_steps")
     flavor_profile = data.get("flavor_profile")
     user_id = data.get("user_id")
-
-    # Verificaciones de campos requeridos
+    url_image = data.get("url_image")
     if not cocktail_name:
         return jsonify({"Error": "El nombre del cóctel es obligatorio."}), 400
     if not preparation_steps:
@@ -123,14 +137,14 @@ def create_cocktail():
         return jsonify({"Error": "El perfil de sabor es obligatorio."}), 400
     if not user_id:
         return jsonify({"Error": "El ID de usuario es obligatorio."}), 400
-
+    
     try:
-        # Nuevo cóctel
         new_cocktail = Cocktail(
             name=cocktail_name,
             preparation_steps=preparation_steps,
             flavor_profile=flavor_profile,
-            user_id=user_id
+            user_id=user_id,
+            url_image=url_image
         )
 
         db.session.add(new_cocktail)
@@ -139,7 +153,6 @@ def create_cocktail():
         return jsonify(new_cocktail.serialize()), 201
 
     except Exception as e:
-        # Maneja errores al guardar el cóctel en la base de datos
         print("Error al guardar el cóctel:", e)
         db.session.rollback()
         return jsonify({"Error": f"Error al guardar el cóctel: {str(e)}"}), 500
@@ -150,12 +163,9 @@ def update_cocktail(Cocktail_id):
     data = request.json
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
-    # Busca el cóctel por el id
     cocktail = Cocktail.query.get(Cocktail_id)
-    # Si no lo encuentra
     if not cocktail:
         return jsonify({"Error": "Cóctel no encontrado."}), 404
-    # Actualización cóctel
     cocktail.name = data.get("name", cocktail.name)
     cocktail.preparation_steps = data.get("preparation_steps", cocktail.preparation_steps)
     cocktail.flavor_profile = data.get("flavor_profile", cocktail.flavor_profile)
@@ -168,12 +178,10 @@ def update_cocktail(Cocktail_id):
 
 @api.route("/cocktail/<int:Cocktail_id>", methods=["DELETE"])
 def delete_cocktail(Cocktail_id):
-    # Busca el cóctel
     cocktail = Cocktail.query.get(Cocktail_id)
     if not cocktail:
         return jsonify({"Error": "Cóctel no encontrado."}), 404
     try:
-        # Elimina
         db.session.delete(cocktail)
         db.session.commit()
     except Exception as e:
@@ -185,13 +193,11 @@ def delete_cocktail(Cocktail_id):
 # endpoints platos
 @api.route("/dishes", methods=["GET"])
 def get_dishes():
-    # Obtiene todos los platos
     dishes = Dish.query.all()
     return jsonify([dish.serialize() for dish in dishes])
 
 @api.route("/dish/<int:Dish_id>", methods=["GET"])
 def get_dish(Dish_id):
-    # Obtiene el plato por el id o da error
     dish = Dish.query.get_or_404(Dish_id)
     return jsonify(dish.serialize())
 
@@ -203,7 +209,6 @@ def post_dish():
     dish = data.get
     if not dish:
         return jsonify({"Error": "El plato es necesario."}), 400
-    # Nuevo plato
     new_dish = Dish(
         name=data.get("name"),
         preparation_steps=data.get("preparation_steps"),
@@ -215,15 +220,14 @@ def post_dish():
 
 @api.route("/dish/<int:Dish_id>", methods=["PUT"])
 def update_dish(Dish_id):
-    # Convierte la data json
+    
     data = request.json
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
-    # Busca el plato por el id
+   
     dish = Dish.query.get(Dish_id)
     if not dish:
         return jsonify({"Error": "Plato no encontrado."}), 404
-    # Actualización del plato
     dish.name = data.get("name", dish.name)
     dish.preparation_steps = data.get("preparation_steps", dish.preparation_steps)
     dish.flavor_profile = data.get("flavor_profile", dish.flavor_profile)
@@ -236,12 +240,10 @@ def update_dish(Dish_id):
 
 @api.route("/dish/<int:Dish_id>", methods=["DELETE"])
 def delete_dish(Dish_id):
-    # Obtiene plato por id
     dish = Dish.query.get(Dish_id)
     if not dish:
         return jsonify({"Error": "Plato no encontrado."}), 404
     try:
-        # Elimina
         db.session.delete(dish)
         db.session.commit()
     except Exception as e:
@@ -250,37 +252,31 @@ def delete_dish(Dish_id):
 
     return jsonify({"msg": "Plato eliminado correctamente."})
 
-# endpoints favoritos
+
 @api.route("/favorites", methods=["GET"])
 def get_favourites():
-    # Obtiene todos los favoritos
     favorites = Favorite.query.all()
     return jsonify([favorite.serialize() for favorite in favorites])
 
 @api.route("/get-favorite/<int:favorite_id>", methods=["GET"])
 def get_favorite(favorite_id):
-    # Obtiene el favorito por el id o da error
+   
     favorite = Favorite.query.get_or_404(favorite_id)
     return jsonify(favorite.serialize())
 
 @api.route("/favorite", methods=["POST"])
 def create_favorite():
-    # Convierte la data a json
     data = request.json
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
-    # Necesario
     user_id = data.get('user_id')
     cocktail_id = data.get('cocktail_id')
     dish_id = data.get('dish_id')
-    # Si no encuentra ningún id asociado a ningún plato o cóctel
     if not user_id or (not cocktail_id and not dish_id):
         return jsonify({"Error": "Se requieren el ID de usuario y ya sea el ID de cóctel o de plato."}), 400
-    # Si encuentra un id de plato y de cóctel
     if cocktail_id and dish_id:
         return jsonify({"Error": "Solo puedes marcar como favorito un plato o un cóctel, no ambos."}), 400
 
-    # Crear el favorito
     new_favorite = Favorite(
         user_id=user_id,
         cocktail_id=cocktail_id,
@@ -292,9 +288,7 @@ def create_favorite():
         return jsonify(new_favorite.serialize()), 201
     except Exception as e:
         db.session.rollback()
-        # Agregar el logging del error
         logging.exception("Ocurrió un error durante la creación del favorito.")
-        # Devolver el mensaje de error exacto
         return jsonify({"Error": str(e)}), 500
 
 @api.route("/favorite/<int:fav_id>", methods=["PUT"])
@@ -302,21 +296,18 @@ def update_favorite(fav_id):
     data = request.json
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
-
-    # Obtener los nuevos valores de cocktail_id y dish_id
     cocktail_id = data.get('cocktail_id')
     dish_id = data.get('dish_id')
 
-    # Verificar si al menos uno de los IDs se proporciona
     if not cocktail_id and not dish_id:
         return jsonify({"Error": "Se requiere el ID de cóctel o el ID de plato."}), 400
 
-    # Buscar el favorito existente
+
     favorite = Favorite.query.get(fav_id)
     if not favorite:
         return jsonify({"Error": "Favorito no encontrado."}), 404
 
-    # Actualizar los campos según los datos proporcionados
+   
     if cocktail_id is not None:
         favorite.cocktail_id = cocktail_id
     if dish_id is not None:
@@ -327,7 +318,6 @@ def update_favorite(fav_id):
         return jsonify(favorite.serialize()), 200
     except Exception as e:
         db.session.rollback()
-        # Registrar el error para depuración
         logging.error("Error al guardar en la base de datos: %s", str(e))
         return jsonify({"Error": str(e)}), 500
 
@@ -338,7 +328,6 @@ def delete_favorite(favorite_id):
         return jsonify({"Error": "Favorito no encontrado."}), 404
 
     try:
-        # Elimina
         db.session.delete(favorite)
         db.session.commit()
     except Exception as e:
@@ -354,7 +343,6 @@ def get_pairings():
 
 @api.route("/pairing/<int:pairing_id>", methods=["GET"])
 def get_pairing(pairing_id):
-    # obtiene el emparejamiento por el id o da error
     pairing = Pairing.query.get_or_404(pairing_id)
     return jsonify(pairing.serialize())
 
@@ -381,7 +369,6 @@ def update_pairing(pairing_id):
     data = request.get_json()
     pairing = Pairing.query.get_or_404(pairing_id)
 
-    # Actualizar los campos si están presentes en la solicitud
     if 'user_id' in data:
         pairing.user_id = data['user_id']
     if 'cocktail_id' in data:

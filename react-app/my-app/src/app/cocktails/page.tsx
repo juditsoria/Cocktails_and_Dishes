@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useRouter } from 'next/navigation';
 
-
 const Cocktails = () => {
   const [cocktails, setCocktails] = useState<any[]>([]);
   const [error, setError] = useState<string>('');
@@ -15,7 +14,22 @@ const Cocktails = () => {
     image: '',
     flavor_profile: 'sweet',
   });
- // fetch de la api externa de cocteles
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Crear una URL local para la imagen seleccionada
+      const imageUrl = URL.createObjectURL(file);
+      
+      // Actualizar el estado con la URL local de la imagen
+      setCustomCocktail((prev) => ({
+        ...prev,
+        image: imageUrl,  // Guardar la URL local
+      }));
+    }
+  };
+
+  // fetch de la api externa de cócteles
   const fetchCocktails = async () => {
     try {
       const cocktailPromises = Array.from({ length: 5 }, async () => {
@@ -38,11 +52,11 @@ const Cocktails = () => {
       setLoading(false);
     }
   };
-//muestra el coctel
+
   useEffect(() => {
     fetchCocktails();
   }, []);
-// refresca la pagina para que se muestre un coctel diferente
+
   const refreshCocktails = () => {
     setLoading(true);
     setCocktails([]);
@@ -50,28 +64,28 @@ const Cocktails = () => {
     fetchCocktails();
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setCustomCocktail((prev) => ({ ...prev, [name]: value }));
+    setCustomCocktail((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
+    // Verifica la URL de la imagen antes de enviar
+    console.log('URL de la imagen antes de enviar:', customCocktail.image);
+  
     const cocktailData = {
       name: customCocktail.name,
-      preparation_steps: customCocktail.preparation_steps, // Usamos preparation_steps ahora
+      preparation_steps: customCocktail.preparation_steps,
       flavor_profile: customCocktail.flavor_profile,
-      url_image: customCocktail.image,
+      url_image: customCocktail.image, // Se captura la URL que el usuario introdujo
       user_id: 2,
-      // advertencia!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// esto modificarlo mas adelante cuando se cree el login y el registr!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     };
-    // Agregar console.log para verificar los datos antes de enviarlos
-  console.log('Datos del cóctel:', cocktailData);
+  
     try {
       const response = await fetch("http://127.0.0.1:5000/api/cocktail", {
         method: 'POST',
@@ -80,10 +94,10 @@ const Cocktails = () => {
         },
         body: JSON.stringify(cocktailData),
       });
-
+  
       if (!response.ok) {
         const data = await response.json();
-        console.log('Respuesta del servidor:', data); // Log de la respuesta completa
+        console.log('Respuesta del servidor:', data);
         setError(data.Error || 'Error al guardar el cóctel');
       } else {
         console.log('Cóctel guardado:', cocktailData);
@@ -91,16 +105,17 @@ const Cocktails = () => {
           name: '',
           preparation_steps: '',
           flavor_profile: 'sweet',
-          image: '',
+          image: '', // Se limpia después de enviar
         });
         alert('Cóctel guardado correctamente');
         router.push('/favorites');
       }
     } catch (err) {
-        console.error('Error al guardar el cóctel:', err);
+      console.error('Error al guardar el cóctel:', err);
       setError('Hubo un error al guardar el cóctel.');
     }
   };
+  
 
   if (loading) {
     return <p>Cargando cócteles...</p>;
@@ -191,15 +206,15 @@ const Cocktails = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="image" className="form-label">
-                    URL de la Imagen
+                    Añadir Foto
                   </label>
                   <input
-                    type="text"
+                    type="file"
                     className="form-control"
                     id="image"
                     name="image"
-                    value={customCocktail.image}
-                    onChange={handleInputChange}
+                    accept="image/*"
+                    onChange={handleImageChange}
                     required
                   />
                 </div>

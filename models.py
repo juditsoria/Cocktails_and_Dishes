@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, Column, Integer, String, DateTime, func, ForeignKey
+from sqlalchemy import Enum, Column, Integer, String, DateTime, func, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
 import db
@@ -34,6 +34,7 @@ class Cocktail(db.Base):
     flavor_profile = Column(Enum('sweet', 'sour', 'bitter', 'salty', 'umami', name='cocktail_enum'),
                                nullable=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
+    url_image = Column(Text, nullable=True)
 
     def serialize(self):
         return {
@@ -42,6 +43,7 @@ class Cocktail(db.Base):
             "preparation_steps": self.preparation_steps,
             "flavor_profile": self.flavor_profile,
             "user_id": self.user_id,
+            "url_image": self.url_image,
         }
 
     def __str__(self):

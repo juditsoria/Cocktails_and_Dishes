@@ -17,7 +17,7 @@ const Navbar = () => {
             <a className="nav-link" href="/login">Tus maridajes perfectos</a>
           </li>
           <li className="nav-item active mx-2">
-            <a className="nav-link" href="/login">Favoritos</a>
+            <a className="nav-link" href="/favorites">Favoritos</a>
           </li>
           <li className="nav-item active mx-2">
             <a className="nav-link" href="/login">Chat</a>
