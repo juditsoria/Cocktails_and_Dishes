@@ -7,8 +7,11 @@ Imagenes:
 - Landing page:
   ![image](https://github.com/user-attachments/assets/aaf2af40-ff5e-4c1d-aa4e-adb76a6cf5a1)
 
-  - Cócteles: (Al darle al botón de ver más cócteles se generan nuevos)
-    ![image](https://github.com/user-attachments/assets/aa368130-9729-4a68-9685-cb3c6e504121)
+  - Cócteles: 
+    ![image](https://github.com/user-attachments/assets/908b0faa-1ee3-41b3-a162-42079d07cae1)
+    - A la izquierda salen los cócteler que vienen de la api externa, si le das al botón "Ver más cócteles" que hay en la parte de arriba de la card, se refresca la página y aparece un nuevo cóctel.
+    - A la derecha tenemos un formulario por si el usuario prefiere crear sus propios cócteles, almacenandose en la BBDD y guardandose en favoritos.
+
     
 
 Tecnologías Utilizadas
