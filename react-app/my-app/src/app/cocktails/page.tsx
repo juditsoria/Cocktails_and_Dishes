@@ -15,19 +15,59 @@ const Cocktails = () => {
     flavor_profile: 'sweet',
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Crear una URL local para la imagen seleccionada
-      const imageUrl = URL.createObjectURL(file);
-      
-      // Actualizar el estado con la URL local de la imagen
-      setCustomCocktail((prev) => ({
-        ...prev,
-        image: imageUrl,  // Guardar la URL local
-      }));
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "judittt"); // preset Cloudinary
+  
+      try {
+        // Subir la imagen a Cloudinary
+        const cloudinaryResponse = await fetch(
+          "https://api.cloudinary.com/v1_1/dxqbmbj3j/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+  
+        if (!cloudinaryResponse.ok) {
+          throw new Error("Error al subir la imagen a Cloudinary");
+        }
+  
+        const cloudinaryData = await cloudinaryResponse.json();
+        const cloudinaryUrl = cloudinaryData.secure_url; // URL de Cloudinary
+  
+        // Actualizar la tabla cocktails con la URL de Cloudinary
+        const cocktailUpdateResponse = await fetch("http://tu-backend.com/cocktails/update", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cocktailId: 1, // Reemplaza con el ID del cóctel correspondiente
+            image_url: cloudinaryUrl,
+          }),
+        });
+  
+        if (!cocktailUpdateResponse.ok) {
+          throw new Error("Error al actualizar la tabla cocktails");
+        }
+  
+        // Actualizar el estado local
+        setCustomCocktail((prev) => ({
+          ...prev,
+          image: cloudinaryUrl,
+        }));
+  
+        console.log("Imagen subida a Cloudinary y cóctel actualizado exitosamente");
+      } catch (error) {
+        console.error("Error al manejar la imagen:", error);
+      }
     }
   };
+  
 
   // fetch de la api externa de cócteles
   const fetchCocktails = async () => {

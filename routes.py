@@ -117,10 +117,12 @@ def get_cocktail(Cocktail_id):
     cocktail = Cocktail.query.get_or_404(Cocktail_id)
     return jsonify(cocktail.serialize())
 
+
 @api.route("/cocktail", methods=["POST"])
 def create_cocktail():
     data = request.json
-    print("Datos recibidos:", data)
+    file = request.files.get("image") 
+
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
 
@@ -128,7 +130,7 @@ def create_cocktail():
     preparation_steps = data.get("preparation_steps")
     flavor_profile = data.get("flavor_profile")
     user_id = data.get("user_id")
-    url_image = data.get("url_image")
+    
     if not cocktail_name:
         return jsonify({"Error": "El nombre del cóctel es obligatorio."}), 400
     if not preparation_steps:
@@ -139,6 +141,11 @@ def create_cocktail():
         return jsonify({"Error": "El ID de usuario es obligatorio."}), 400
     
     try:
+        url_image = None
+        if file:
+            upload_result = cloudinary.uploader.upload(file)
+            url_image = upload_result["secure_url"]
+
         new_cocktail = Cocktail(
             name=cocktail_name,
             preparation_steps=preparation_steps,
@@ -163,6 +170,51 @@ def update_cocktail(Cocktail_id):
     data = request.json
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
+
+    cocktail = db.session.query(Cocktail).get(Cocktail_id)
+    if not cocktail:
+        return jsonify({"Error": "Cóctel no encontrado."}), 404
+
+    cocktail.name = data.get("name", cocktail.name)
+    cocktail.preparation_steps = data.get("preparation_steps", cocktail.preparation_steps)
+    cocktail.flavor_profile = data.get("flavor_profile", cocktail.flavor_profile)
+
+    try:
+        db.session.commit()
+        return jsonify({"Success": "Cóctel actualizado correctamente."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"Error": str(e)}), 500
+
+
+    data = request.json
+    file = request.files.get("image") 
+
+    cocktail = Cocktail.query.get(Cocktail_id)
+    if not cocktail:
+        return jsonify({"Error": "Cóctel no encontrado."}), 404
+
+    cocktail.name = data.get("name", cocktail.name)
+    cocktail.preparation_steps = data.get("preparation_steps", cocktail.preparation_steps)
+    cocktail.flavor_profile = data.get("flavor_profile", cocktail.flavor_profile)
+
+    try:
+        # Subir nueva imagen a Cloudinary si se proporciona
+        if file:
+            upload_result = cloudinary.uploader.upload(file)
+            cocktail.url_image = upload_result["secure_url"]
+
+        db.session.commit()
+        return jsonify({"Success": "Cóctel actualizado correctamente."}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print("Error al actualizar el cóctel:", e)
+        return jsonify({"Error": str(e)}), 500
+
+    data = request.json
+    if not data:
+        return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
     cocktail = Cocktail.query.get(Cocktail_id)
     if not cocktail:
         return jsonify({"Error": "Cóctel no encontrado."}), 404
@@ -175,6 +227,7 @@ def update_cocktail(Cocktail_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"Error": str(e)}), 500
+
 
 @api.route("/cocktail/<int:Cocktail_id>", methods=["DELETE"])
 def delete_cocktail(Cocktail_id):
