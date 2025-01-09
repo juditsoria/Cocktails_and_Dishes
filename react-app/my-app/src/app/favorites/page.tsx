@@ -24,6 +24,7 @@ const Favorites = () => {
           throw new Error('Error al obtener los favoritos');
         }
         const data = await response.json();
+        console.log("Datos recibidos desde el backend:", data);
         setFavorites(data); 
       } catch (err) {
         if (err instanceof Error) {

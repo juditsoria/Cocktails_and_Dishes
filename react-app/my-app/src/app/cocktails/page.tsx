@@ -11,8 +11,8 @@ const Cocktails = () => {
   const [customCocktail, setCustomCocktail] = useState({
     name: '',
     preparation_steps: '',
-    image: '',
     flavor_profile: 'sweet',
+    url_image: '',
   });
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +50,7 @@ const Cocktails = () => {
       // Actualizar el estado local
       setCustomCocktail((prev) => ({
         ...prev,
-        image: cloudinaryUrl,
+        url_image: cloudinaryUrl,
       }));
   
       console.log("Imagen subida a Cloudinary y cóctel actualizado exitosamente", cloudinaryUrl);
@@ -106,14 +106,17 @@ const Cocktails = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
-    // Verifica la URL de la imagen antes de enviar
-    console.log('URL de la imagen antes de enviar:', customCocktail.image);
+    // Verifica si la imagen ha sido cargada correctamente antes de continuar
+    if (!customCocktail.url_image) {
+      setError('La imagen es obligatoria');
+      return; // Prevenir el envío si no hay imagen
+    }
   
     const cocktailData = {
       name: customCocktail.name,
       preparation_steps: customCocktail.preparation_steps,
       flavor_profile: customCocktail.flavor_profile,
-      url_image: customCocktail.image, // Se captura la URL que el usuario introdujo
+      url_image: customCocktail.url_image, // Se captura la URL que el usuario introdujo
       user_id: 2,
     };
   
@@ -136,7 +139,7 @@ const Cocktails = () => {
           name: '',
           preparation_steps: '',
           flavor_profile: 'sweet',
-          image: '', // Se limpia después de enviar
+          url_image: '', // Se limpia después de enviar
         });
         alert('Cóctel guardado correctamente');
         router.push('/favorites');
@@ -146,6 +149,7 @@ const Cocktails = () => {
       setError('Hubo un error al guardar el cóctel.');
     }
   };
+  
   
 
   if (loading) {

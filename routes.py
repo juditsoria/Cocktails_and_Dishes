@@ -121,7 +121,7 @@ def get_cocktail(Cocktail_id):
 @api.route("/cocktail", methods=["POST"])
 def create_cocktail():
     data = request.json
-    file = request.files.get("image") 
+    file = request.files.get("url_image") 
 
     if not data:
         return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
@@ -130,7 +130,8 @@ def create_cocktail():
     preparation_steps = data.get("preparation_steps")
     flavor_profile = data.get("flavor_profile")
     user_id = data.get("user_id")
-    
+    url_image = None  # Iniciar url_image como None
+
     if not cocktail_name:
         return jsonify({"Error": "El nombre del cóctel es obligatorio."}), 400
     if not preparation_steps:
@@ -139,30 +140,34 @@ def create_cocktail():
         return jsonify({"Error": "El perfil de sabor es obligatorio."}), 400
     if not user_id:
         return jsonify({"Error": "El ID de usuario es obligatorio."}), 400
-    
-    try:
-        url_image = None
-        if file:
+
+    # Si hay un archivo de imagen, subirla a Cloudinary
+    if file:
+        try:
             upload_result = cloudinary.uploader.upload(file)
             url_image = upload_result["secure_url"]
+            print("URL de la imagen:", url_image)
+        except Exception as e:
+            return jsonify({"Error": f"Error al cargar la imagen: {str(e)}"}), 500
 
-        new_cocktail = Cocktail(
-            name=cocktail_name,
-            preparation_steps=preparation_steps,
-            flavor_profile=flavor_profile,
-            user_id=user_id,
-            url_image=url_image
-        )
-
+    # Crear el nuevo cóctel
+    new_cocktail = Cocktail(
+        name=cocktail_name,
+        preparation_steps=preparation_steps,
+        flavor_profile=flavor_profile,
+        user_id=user_id,
+        url_image=url_image  # Si no hay imagen, se guardará como None
+    )
+    print("Nuevo cóctel antes de agregar:", new_cocktail)
+    try:
+        # Guardar en la base de datos
         db.session.add(new_cocktail)
         db.session.commit()
-
         return jsonify(new_cocktail.serialize()), 201
-
     except Exception as e:
-        print("Error al guardar el cóctel:", e)
         db.session.rollback()
         return jsonify({"Error": f"Error al guardar el cóctel: {str(e)}"}), 500
+
 
 
 @api.route("/cocktail/<int:Cocktail_id>", methods=["PUT"])
