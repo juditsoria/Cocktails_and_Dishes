@@ -12,6 +12,11 @@ Imagenes:
     - A la izquierda salen los cócteler que vienen de la api externa, si le das al botón "Ver más cócteles" que hay en la parte de arriba de la card, se refresca la página y aparece un nuevo cóctel.
     - A la derecha tenemos un formulario por si el usuario prefiere crear sus propios cócteles, almacenandose en la BBDD y guardandose en favoritos.
 
+- Favoritos:
+    ![image](https://github.com/user-attachments/assets/756552d1-f6f7-4f24-bacf-1ba15e578402)
+      -Cuando se crea un cóctel mediante el formulario anterior, los datos se almacenan en la base de datos. La imagen asociada al cóctel se sube a Cloudinary, y la URL correspondiente de Cloudinary se guarda             también en la base de datos. Posteriormente, toda la información, incluida la imagen, se presenta adecuadamente.
+
+
     
 
 Tecnologías Utilizadas
