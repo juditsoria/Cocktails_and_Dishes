@@ -112,7 +112,8 @@ def create_cocktail():
     preparation_steps = data.get("preparation_steps")
     flavor_profile = data.get("flavor_profile")
     user_id = data.get("user_id")
-    url_image = None  # Iniciar url_image como None
+    url_image = data.get("url_image")
+
 
     if not cocktail_name:
         return jsonify({"Error": "El nombre del cóctel es obligatorio."}), 400
@@ -122,6 +123,9 @@ def create_cocktail():
         return jsonify({"Error": "El perfil de sabor es obligatorio."}), 400
     if not user_id:
         return jsonify({"Error": "El ID de usuario es obligatorio."}), 400
+    if not url_image:
+        return jsonify({"Error": "La URL de la imagen es obligatoria."}), 400
+
 
     # Si hay un archivo de imagen, subirla a Cloudinary
     if file:
