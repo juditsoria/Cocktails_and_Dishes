@@ -108,6 +108,7 @@ const Cocktails = () => {
   
     // Verifica si la imagen ha sido cargada correctamente antes de continuar
     if (!customCocktail.url_image) {
+      console.log('Estado antes de enviar:', customCocktail);
       setError('La imagen es obligatoria');
       return; // Prevenir el envío si no hay imagen
     }
@@ -128,7 +129,7 @@ const Cocktails = () => {
         },
         body: JSON.stringify(cocktailData),
       });
-  
+      console.log('Respuesta del servidor:', response);
       if (!response.ok) {
         const data = await response.json();
         console.log('Respuesta del servidor:', data);
@@ -141,6 +142,7 @@ const Cocktails = () => {
           flavor_profile: 'sweet',
           url_image: '', // Se limpia después de enviar
         });
+        console.log('URL de imagen actualizada:', customCocktail.url_image);
         alert('Cóctel guardado correctamente');
         router.push('/favorites');
       }

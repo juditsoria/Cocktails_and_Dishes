@@ -14,24 +14,6 @@ api = Blueprint('api', __name__)
 def test():
     return {"message": "Hello from Flask"}
 
-# endpoint para subir las imagenes de los cocktails
-@api.route('/api/upload', methods=['POST'])
-def upload_image():
-    file = request.files.get('file')
-    if not file:
-        return jsonify({'error': 'No file uploaded'}), 400
-    
-    # Si el archivo está presente, imprime su nombre y tipo
-    print(f"Archivo recibido: {file.filename}, Tipo: {file.mimetype}")
-    
-    # Lógica para manejar el archivo
-    return jsonify({'message': 'Archivo recibido correctamente'})
-    
-    try:
-        upload_result = cloudinary.uploader.upload(file)
-        return jsonify({'url': upload_result['url']})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 # Endpoints sobre usuarios
 @api.route("/users", methods=["GET"])
