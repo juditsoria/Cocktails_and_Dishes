@@ -34,11 +34,11 @@ const Favorites = () => {
         }
         const favoritesData = await favoritesResponse.json();
 
-        // Combinar ambos resultados (los cócteles creados y los favoritos)
+        // Combinar ambos resultados 
         const combinedFavorites = [...cocktailsData, ...favoritesData];
         console.log("Datos combinados recibidos desde el backend:", combinedFavorites);
 
-        // Actualizar el estado con los cócteles combinados
+        // Actualizar el estado 
         setFavorites(combinedFavorites); 
       } catch (err) {
         if (err instanceof Error) {
