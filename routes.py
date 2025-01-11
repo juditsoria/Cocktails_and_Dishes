@@ -299,8 +299,9 @@ def delete_dish(Dish_id):
 
 @api.route("/favorites", methods=["GET"])
 def get_favourites():
-    favorites = Favorite.query.all()
+    favorites = db.session.query(Favorite).all()
     return jsonify([favorite.serialize() for favorite in favorites])
+
 
 @api.route("/get-favorite/<int:favorite_id>", methods=["GET"])
 def get_favorite(favorite_id):

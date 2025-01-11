@@ -14,18 +14,18 @@ const Cocktails = () => {
     flavor_profile: 'sweet',
     url_image: '',
   });
-
+ // función que sirve para subir las imagenes a cloudinary y mandar la url al back
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; 
+    const file = e.target.files?.[0];
     if (!file) {
       console.error("No se seleccionó ningún archivo");
-      return; 
+      return;
     }
-  
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "judittt"); // Preset de Cloudinary
-  
+
     try {
       // Subir la imagen a Cloudinary
       const cloudinaryResponse = await fetch(
@@ -35,30 +35,30 @@ const Cocktails = () => {
           body: formData,
         }
       );
-  
+
       if (!cloudinaryResponse.ok) {
         throw new Error(`Error al subir la imagen: ${cloudinaryResponse.statusText}`);
       }
-  
+
       const cloudinaryData = await cloudinaryResponse.json();
       const cloudinaryUrl = cloudinaryData.secure_url; // URL segura de la imagen en Cloudinary
-  
+
       if (!cloudinaryUrl) {
         throw new Error("No se recibió una URL válida de Cloudinary");
       }
-  
+
       // Actualizar el estado local
       setCustomCocktail((prev) => ({
         ...prev,
         url_image: cloudinaryUrl,
       }));
-  
+
       console.log("Imagen subida a Cloudinary y cóctel actualizado exitosamente", cloudinaryUrl);
     } catch (error) {
       console.error("Error al manejar la imagen:", error);
     }
   };
-  
+
 
   // fetch de la api externa de cócteles
   const fetchCocktails = async () => {
@@ -102,17 +102,17 @@ const Cocktails = () => {
       [name]: value,
     }));
   };
-
+// manda la informacion del formulario al back
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // Verifica si la imagen ha sido cargada correctamente antes de continuar
     if (!customCocktail.url_image) {
       console.log('Estado antes de enviar:', customCocktail);
       setError('La imagen es obligatoria');
-      return; // Prevenir el envío si no hay imagen
+      return; 
     }
-  
+
     const cocktailData = {
       name: customCocktail.name,
       preparation_steps: customCocktail.preparation_steps,
@@ -120,7 +120,7 @@ const Cocktails = () => {
       url_image: customCocktail.url_image, // Se captura la URL que el usuario introdujo
       user_id: 2,
     };
-  
+      // crear cóckteles propios
     try {
       const response = await fetch("http://127.0.0.1:5000/api/cocktail", {
         method: 'POST',
@@ -151,8 +151,43 @@ const Cocktails = () => {
       setError('Hubo un error al guardar el cóctel.');
     }
   };
-  
-  
+  // Añadir un cócktel de la api externa a favoritos
+  const addToFavorites = async (cocktailId: number) => {
+    const userId = 1;  // O el ID del usuario logueado, dependiendo de cómo lo manejes
+
+    if (!cocktailId) {
+      alert('No se proporcionó un cóctel válido');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/favorite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          cocktail_id: cocktailId,
+          dish_id: null,  
+        }),
+      });
+
+      if (response.ok) {
+        alert('Cóctel añadido a favoritos');
+      } else {
+        const result = await response.json();
+        alert(result.Error || 'Hubo un error al añadir a favoritos');
+      }
+    } catch (error) {
+      console.error('Error al añadir a favoritos:', error);
+      alert('Hubo un error de conexión');
+    }
+  };
+
+
+
+
 
   if (loading) {
     return <p>Cargando cócteles...</p>;
@@ -160,6 +195,7 @@ const Cocktails = () => {
 
   return (
     <div className="container mt-5">
+      {/*Card para mostrar los cóckteles traidos de la api*/}
       <div className="row">
         <div className="col-md-6">
           {error && <p>{error}</p>}
@@ -183,7 +219,12 @@ const Cocktails = () => {
               <h5 className="card-title">{cocktails[0]?.strDrink}</h5>
               <p className="card-text">{cocktails[0]?.strInstructions}</p>
               <div className="d-flex justify-content-between">
-                <button className="btn btn-primary">Añadir a Favoritos</button>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => addToFavorites(cocktails[0]?.idDrink)} 
+                >
+                  Añadir a Favoritos
+                </button>
                 <button className="btn btn-secondary">Crear Maridaje</button>
               </div>
             </div>

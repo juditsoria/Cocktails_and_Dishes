@@ -2,8 +2,8 @@ import React from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importa los estilos de Bootstrap
-import Footer from "./components/footer.tsx";
-import Navbar from "./components/navbar.tsx";
+import Footer from "./components/footer";
+import Navbar from "./components/navbar";
 import 'bootswatch/dist/sketchy/bootstrap.min.css';
 
 const geistSans = Geist({
