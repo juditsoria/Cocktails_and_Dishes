@@ -61,6 +61,8 @@ class Dish(db.Base):
     flavor_profile = Column(Enum('sweet', 'sour', 'bitter', 'salty', 'umami', name='flavor_profile_enum'),
                                nullable=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
+    url_image = Column(Text, nullable=True)
+
 
     def serialize(self):
         return {
@@ -70,6 +72,7 @@ class Dish(db.Base):
             "preparation_steps": self.preparation_steps,
             "flavor_profile": self.flavor_profile,
             "user_id": self.user_id,
+            "url_image":self.url_image,
         }
 
     def __str__(self):

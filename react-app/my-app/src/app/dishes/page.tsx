@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useRouter } from 'next/navigation';
 
-const Cocktails = () => {
-  const [cocktails, setCocktails] = useState<any[]>([]);
+const Dishes = () => {
+  const [dishes, setDishes] = useState<any[]>([]);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
-  const [customCocktail, setCustomCocktail] = useState({
+  const [customDish, setCustomDish] = useState({
     name: '',
     preparation_steps: '',
     flavor_profile: 'sweet',
@@ -24,7 +24,7 @@ const Cocktails = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "judittt"); // Preset de Cloudinary
+    formData.append("upload_preset", "dish"); // Preset de Cloudinary
 
     try {
       // Subir la imagen a Cloudinary
@@ -48,7 +48,7 @@ const Cocktails = () => {
       }
 
       // Actualizar el estado local
-      setCustomCocktail((prev) => ({
+      setCustomDish((prev) => ({
         ...prev,
         url_image: cloudinaryUrl,
       }));
@@ -61,43 +61,43 @@ const Cocktails = () => {
 
 
   // fetch de la api externa de cócteles
-  const fetchCocktails = async () => {
+  const fetchDishes = async () => {
     try {
-      const cocktailPromises = Array.from({ length: 5 }, async () => {
+      const dishesPromises = Array.from({ length: 5 }, async () => {
         const response = await fetch('https://www.thecocktaildb.com/api/json/v1/1/random.php');
         const data = await response.json();
-        return data.drinks ? data.drinks[0] : null;
+        return data.dish ? data.dish[0] : null;
       });
 
-      const cocktailsData = await Promise.all(cocktailPromises);
-      const validCocktails = cocktailsData.filter((cocktail) => cocktail !== null);
+      const dishesData = await Promise.all(dishesPromises);
+      const validDishes = dishesData.filter((dish) => dish !== null);
 
-      if (validCocktails.length === 0) {
-        setError('No se encontraron cócteles.');
+      if (validDishes.length === 0) {
+        setError('No se encontraron platos.');
       } else {
-        setCocktails(validCocktails);
+        setDishes(validDishes);
       }
     } catch (err) {
-      setError('Hubo un error al obtener los cócteles.');
+      setError('Hubo un error al obtener los platos.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCocktails();
+    fetchDishes();
   }, []);
 
-  const refreshCocktails = () => {
+  const refreshDishes = () => {
     setLoading(true);
-    setCocktails([]);
+    setDishes([]);
     setError('');
-    fetchCocktails();
+    fetchDishes();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setCustomCocktail((prev) => ({
+    setCustomDish((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -107,56 +107,56 @@ const Cocktails = () => {
     e.preventDefault();
 
     // Verifica si la imagen ha sido cargada correctamente antes de continuar
-    if (!customCocktail.url_image) {
-      console.log('Estado antes de enviar:', customCocktail);
+    if (!customDish.url_image) {
+      console.log('Estado antes de enviar:', customDish);
       setError('La imagen es obligatoria');
       return; 
     }
 
-    const cocktailData = {
-      name: customCocktail.name,
-      preparation_steps: customCocktail.preparation_steps,
-      flavor_profile: customCocktail.flavor_profile,
-      url_image: customCocktail.url_image, // Se captura la URL que el usuario introdujo
+    const dishData = {
+      name: customDish.name,
+      preparation_steps: customDish.preparation_steps,
+      flavor_profile: customDish.flavor_profile,
+      url_image: customDish.url_image, // Se captura la URL que el usuario introdujo
       user_id: 2,
     };
       // crear cóckteles propios
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/cocktail", {
+      const response = await fetch("http://127.0.0.1:5000/api/dish", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(cocktailData),
+        body: JSON.stringify(dishData),
       });
       console.log('Respuesta del servidor:', response);
       if (!response.ok) {
         const data = await response.json();
         console.log('Respuesta del servidor:', data);
-        setError(data.Error || 'Error al guardar el cóctel');
+        setError(data.Error || 'Error al guardar el plato');
       } else {
-        console.log('Cóctel guardado:', cocktailData);
-        setCustomCocktail({
+        console.log('Plato guardado:', dishData);
+        setCustomDish({
           name: '',
           preparation_steps: '',
           flavor_profile: 'sweet',
           url_image: '', // Se limpia después de enviar
         });
-        console.log('URL de imagen actualizada:', customCocktail.url_image);
+        console.log('URL de imagen actualizada:', customDish.url_image);
         alert('Cóctel guardado correctamente');
         router.push('/favorites');
       }
     } catch (err) {
-      console.error('Error al guardar el cóctel:', err);
-      setError('Hubo un error al guardar el cóctel.');
+      console.error('Error al guardar el plato:', err);
+      setError('Hubo un error al guardar el plato.');
     }
   };
   // Añadir un cócktel de la api externa a favoritos
-  const addToFavorites = async (cocktailId: number) => {
+  const addToFavorites = async (dishId: number) => {
     const userId = 1;  // O el ID del usuario logueado, dependiendo de cómo lo manejes
 
-    if (!cocktailId) {
-      alert('No se proporcionó un cóctel válido');
+    if (!dishId) {
+      alert('No se proporcionó un plato válido');
       return;
     }
 
@@ -168,13 +168,12 @@ const Cocktails = () => {
         },
         body: JSON.stringify({
           user_id: userId,
-          cocktail_id: cocktailId,
-          dish_id: null,  
+          dish_id: dishId,
         }),
       });
 
       if (response.ok) {
-        alert('Cóctel añadido a favoritos');
+        alert('Plato añadido a favoritos');
       } else {
         const result = await response.json();
         alert(result.Error || 'Hubo un error al añadir a favoritos');
@@ -199,16 +198,16 @@ const Cocktails = () => {
       <div className="row">
         <div className="col-md-6">
           {error && <p>{error}</p>}
-          <div className="mb-3 text-white"> ¿Quieres ideas para crear tu cocktel?   
-            <button className="btn btn-info" onClick={refreshCocktails}>
-              Ver más cócteles
+          <div className="mb-3 text-white"> ¿Quieres ideas para crear tus platos?   
+            <button className="btn btn-info" onClick={refreshDishes}>
+              Ver más platos
             </button>
           </div>
           <div className="card mb-4" style={{ width: '100%' }}>
             <img
-              src={cocktails[0]?.strDrinkThumb}
+              src={dishes[0]?.strDrinkThumb}
               className="card-img-top"
-              alt={cocktails[0]?.strDrink}
+              alt={dishes[0]?.strDrink}
               style={{
                 maxHeight: '350px',
                 objectFit: 'contain',
@@ -216,12 +215,12 @@ const Cocktails = () => {
               }}
             />
             <div className="card-body">
-              <h5 className="card-title">{cocktails[0]?.strDrink}</h5>
-              <p className="card-text">{cocktails[0]?.strInstructions}</p>
+              <h5 className="card-title">{dishes[0]?.strDrink}</h5>
+              <p className="card-text">{dishes[0]?.strInstructions}</p>
               <div className="d-flex justify-content-between">
                 <button
                   className="btn btn-primary"
-                  onClick={() => addToFavorites(cocktails[0]?.idDrink)} 
+                  onClick={() => addToFavorites(dishes[0]?.idDrink)} 
                 >
                   Añadir a Favoritos
                 </button>
@@ -233,20 +232,20 @@ const Cocktails = () => {
 
         {/* Formulario para crear cócteles propios */}
         <div className="col-md-6">
-          <h4>¿Prefieres crear tu cóctel propio?</h4>
+          <h4>¿Prefieres crear tu plato propio?</h4>
           <div className="card" style={{ width: '100%' }}>
             <div className="card-body">
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="name" className="form-label">
-                    Nombre del Cóctel
+                    Nombre del Plato
                   </label>
                   <input
                     type="text"
                     className="form-control"
                     id="name"
                     name="name"
-                    value={customCocktail.name}
+                    value={customDish.name}
                     onChange={handleInputChange}
                     required
                   />
@@ -260,7 +259,7 @@ const Cocktails = () => {
                     id="preparation_steps"
                     name="preparation_steps"
                     rows={3}
-                    value={customCocktail.preparation_steps}
+                    value={customDish.preparation_steps}
                     onChange={handleInputChange}
                     required
                   ></textarea>
@@ -273,7 +272,7 @@ const Cocktails = () => {
                     className="form-control"
                     id="flavor_profile"
                     name="flavor_profile"
-                    value={customCocktail.flavor_profile}
+                    value={customDish.flavor_profile}
                     onChange={handleInputChange}
                     required
                   >
@@ -297,7 +296,7 @@ const Cocktails = () => {
                   />
                 </div>
                 <button type="submit" className="btn btn-success">
-                  Guardar Cóctel
+                  Guardar Plato
                 </button>
               </form>
             </div>
@@ -308,4 +307,4 @@ const Cocktails = () => {
   );
 };
 
-export default Cocktails;
+export default Dishes;

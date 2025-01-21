@@ -256,7 +256,9 @@ def post_dish():
     new_dish = Dish(
         name=data.get("name"),
         preparation_steps=data.get("preparation_steps"),
-        flavor_profile=data.get("flavor_profile")
+        flavor_profile=data.get("flavor_profile"),
+        url_image = data.get("url_image")
+
     )
     db.session.add(new_dish)
     db.session.commit()

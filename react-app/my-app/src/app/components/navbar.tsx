@@ -11,7 +11,7 @@ const Navbar = () => {
             <a className="nav-link" href="/cocktails">Cockteles</a>
           </li>
           <li className="nav-item mx-2">
-            <a className="nav-link" href="/register">Platos</a>
+            <a className="nav-link" href="/dishes">Platos</a>
           </li>
           <li className="nav-item active mx-2">
             <a className="nav-link" href="/login">Tus maridajes perfectos</a>
