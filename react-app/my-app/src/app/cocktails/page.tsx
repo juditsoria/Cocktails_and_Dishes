@@ -218,15 +218,7 @@ const Cocktails = () => {
             <div className="card-body">
               <h5 className="card-title">{cocktails[0]?.strDrink}</h5>
               <p className="card-text">{cocktails[0]?.strInstructions}</p>
-              <div className="d-flex justify-content-between">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => addToFavorites(cocktails[0]?.idDrink)} 
-                >
-                  Añadir a Favoritos
-                </button>
-                <button className="btn btn-secondary">Crear Maridaje</button>
-              </div>
+            
             </div>
           </div>
         </div>

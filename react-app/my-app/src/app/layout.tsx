@@ -1,8 +1,7 @@
 import React from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Importa los estilos de Bootstrap
-import Footer from "./components/footer";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from "./components/navbar";
 import 'bootswatch/dist/sketchy/bootstrap.min.css';
 
@@ -28,7 +27,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="d-flex flex-column min-vh-100">
           <Navbar />
           <main className="flex-grow-1">{children}</main>
-          <Footer />
         </div>
       </body>
     </html>
