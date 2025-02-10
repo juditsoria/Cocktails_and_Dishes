@@ -7,9 +7,15 @@ import cloudinary.uploader
 import cloudinary.api
 from dotenv import load_dotenv
 import os
+from flask_jwt_extended import JWTManager
+
 
 
 app = Flask(__name__)
+
+app.config["JWT_SECRET_KEY"] = "judit_mejor_bartender_mundial"  # Cambia esto por una clave segura
+jwt = JWTManager(app)
+
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 load_dotenv()
 cloudinary.config(

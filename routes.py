@@ -5,14 +5,56 @@ from werkzeug.security import generate_password_hash
 import logging
 import cloudinary.uploader
 import cloudinary
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask_jwt_extended import create_access_token
 
 logging.basicConfig(level=logging.DEBUG)
 
 api = Blueprint('api', __name__)
 
+# Configurar JWT
+app = Flask(__name__)
+
 @api.route('/test')
 def test():
     return {"message": "Hello from Flask"}
+
+
+# Endpoint de login
+@api.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    if not data:
+        return jsonify({"error": "No se proporcionaron datos"}), 400
+
+    email = data.get("email")
+    password = data.get("password")
+
+    # Buscar al usuario solo por email
+    user = db.session.query(User).filter(User.email == email).first()
+
+    # Validar que el usuario existe y que la contraseña es correcta
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"error": "Credenciales incorrectas"}), 401
+
+    # Generar token JWT usando el identificador correcto
+    access_token = create_access_token(identity=user.user_id)
+    return jsonify({"token": access_token, "user": user.serialize()}), 200
+
+
+
+# Endpoint protegido con JWT
+@api.route("/me", methods=["GET"])
+@jwt_required()
+def get_current_user():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    return jsonify(user.serialize()), 200
 
 
 # Endpoints sobre usuarios
@@ -29,24 +71,35 @@ def get_user(user_id):
 @api.route("/new-user", methods=["POST"])
 def create_user():
     data = request.json
+    
+    # Verificar que los datos existan
     if not data:
         return jsonify({"error": "No se proporcionaron datos de entrada."}), 400
 
+    email = data.get("email")
+    username = data.get("username")
     password = data.get("password")
-    if not password:
-        return jsonify({"error": "La contraseña es obligatoria"}), 400
+
+    if not email or not username or not password:
+        return jsonify({"error": "Faltan campos requeridos (email, username, password)."}), 400
+
+    # Verificar si el usuario o email ya están registrados
+    existing_user = db.session.query(User).filter((User.email == email) | (User.username == username)).first()
+    if existing_user:
+        return jsonify({"error": "El usuario o email ya están registrados"}), 400
 
     hashed_password = generate_password_hash(password)
-    new_user = User(
-        name=data.get("name"),
-        username=data.get("username"),
-        email=data.get("email"),
+
+    new_user = User(  
+        username=username,
+        email=email,
         password=hashed_password
     )
-
     db.session.add(new_user)
     db.session.commit()
-    return jsonify(new_user.serialize()), 200
+
+    return jsonify(new_user.serialize()), 201
+
 
 @api.route("/user/<int:user_id>", methods=["PUT"])
 def update_user(user_id):
@@ -146,7 +199,6 @@ def create_cocktail():
     )
     print("Nuevo cóctel antes de agregar:", new_cocktail)
     try:
-        # Guardar en la base de datos
         db.session.add(new_cocktail)
         db.session.commit()
         return jsonify(new_cocktail.serialize()), 201

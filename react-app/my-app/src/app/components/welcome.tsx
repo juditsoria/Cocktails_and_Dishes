@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Inter } from 'next/font/google'
+import { useRouter } from "next/navigation";
 
 // Configuración de la fuente
 const inter = Inter({
@@ -10,6 +11,7 @@ const inter = Inter({
 });
 
 const WelcomeSection = () => {
+  const router = useRouter();
   return (
     <div
       className={`container-fluid position-relative text-center text-white py-5 ${inter.className}`}
@@ -23,6 +25,10 @@ const WelcomeSection = () => {
         <h1 className="display-4 fw-bold">
           ¡Bienvenido a nuestra comunidad de amantes de la gastronomía y la coctelería!
         </h1>
+        <button className="btn btn-dark m-2" onClick={()=> router.push('/register')}>Registrarse</button>
+        <button className="btn btn-danger m-2" onClick={()=> router.push('/login')}>Iniciar sesión</button>
+
+
         <p className="lead mb-4">
           Estamos encantados de tenerte con nosotros. Aquí podrás descubrir y compartir recetas de cócteles y platos favoritos, crear maridajes perfectos, participar en foros y chats, unirte a grupos de interés y compartir tus experiencias con otros entusiastas.
         </p>
@@ -41,9 +47,7 @@ const WelcomeSection = () => {
             <strong style={{ fontSize: '1.2em' }}>Únete a grupos de interés:</strong> Conecta con personas que comparten tus pasiones culinarias.
           </li>
         </ul>
-        <p className="mb-4">¡Disfruta de tu experiencia con nosotros!</p>
-        <button className="btn btn-danger m-2">Iniciar sesión</button>
-        <button className="btn btn-dark m-2">Registrarse</button>
+        
       </div>
     </div>
   );
