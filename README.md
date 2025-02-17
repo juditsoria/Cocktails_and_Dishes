@@ -5,12 +5,24 @@ Descripción
 Proyecto dedicado a la creación de una aplicación web enfocada en el maridaje y los cócteles. Este proyecto se centra en ofrecer información detallada sobre cócteles y su combinación con alimentos, así como una experiencia de usuario fluida y moderna.
 Imagenes:
 - Landing page:
-  ![image](https://github.com/user-attachments/assets/aaf2af40-ff5e-4c1d-aa4e-adb76a6cf5a1)
+ <img width="929" alt="image" src="https://github.com/user-attachments/assets/b982e6ec-ebac-4cff-858d-9716130d8b82" />
+
+- Registro
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/d25c69f8-5966-4659-be51-99f4077d1f20" />
+
+- Login
+- <img width="570" alt="image" src="https://github.com/user-attachments/assets/57f873e9-5806-4aac-a669-9e6ac44632e8" />
+
+
 
   - Cócteles: 
-    ![image](https://github.com/user-attachments/assets/908b0faa-1ee3-41b3-a162-42079d07cae1)
-    - A la izquierda salen los cócteler que vienen de la api externa, si le das al botón "Ver más cócteles" que hay en la parte de arriba de la card, se refresca la página y aparece un nuevo cóctel.
-    - A la derecha tenemos un formulario por si el usuario prefiere crear sus propios cócteles, almacenandose en la BBDD y guardandose en favoritos.
+   <img width="911" alt="image" src="https://github.com/user-attachments/assets/ec02f9bf-4103-4463-b9c6-34986b88ffaf" />
+
+    - Cócteler que vienen de la api externa, si le das al botón "Ver más cócteles" que hay en la parte de arriba de la card, se refresca la página y aparece un nuevo cóctel, y si le das a añadir favoritos se guarda el cócktel  como favorito.
+   
+    - <img width="664" alt="image" src="https://github.com/user-attachments/assets/21d716a9-9499-4fc5-91a4-b2a1de2ccc02" />
+
+    - Formulario por si el usuario prefiere crear sus propios cócteles, almacenandose en la BBDD y guardandose en favoritos.
 
 - Favoritos:
     ![image](https://github.com/user-attachments/assets/756552d1-f6f7-4f24-bacf-1ba15e578402)
