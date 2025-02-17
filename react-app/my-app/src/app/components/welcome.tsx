@@ -22,14 +22,14 @@ const WelcomeSection = () => {
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
       ></div>
       <div className="position-relative">
-        <h1 className="display-4 fw-bold">
+        <h1 className="display-4 fw-bold mb-5">
           ¡Bienvenido a nuestra comunidad de amantes de la gastronomía y la coctelería!
         </h1>
-        <button className="btn btn-dark m-2" onClick={()=> router.push('/register')}>Registrarse</button>
-        <button className="btn btn-danger m-2" onClick={()=> router.push('/login')}>Iniciar sesión</button>
+        <button className="btn btn-dark m-5 mt-5" onClick={()=> router.push('/register')}>Registrarse</button>
+        <button className="btn btn-danger m-5 mt-5" onClick={()=> router.push('/login')}>Iniciar sesión</button>
 
 
-        <p className="lead mb-4">
+        <p className="lead mb-4 mt-5">
           Estamos encantados de tenerte con nosotros. Aquí podrás descubrir y compartir recetas de cócteles y platos favoritos, crear maridajes perfectos, participar en foros y chats, unirte a grupos de interés y compartir tus experiencias con otros entusiastas.
         </p>
         <h2 className="h3 mb-3">¿Cómo empezar?</h2>

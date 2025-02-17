@@ -1,49 +1,35 @@
-.register-form {
-    width: 300px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tarjeta de registro con animación de entrada */
+.register-card {
+  width: 100%;
+  max-width: 400px;
+  border: none;
+  border-radius: 10px;
+  background-color: #fff;
+  animation: slideInUp 0.8s ease-out;
+}
+
+/* Definición de la animación */
+@keyframes slideInUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
   }
-  
-  .register-form h2 {
-    text-align: center;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
-  
-  .register-form div {
-    margin-bottom: 15px;
-  }
-  
-  .register-form label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  .register-form input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .register-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .register-form button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .register-form p {
-    color: red;
-    font-size: 14px;
-    text-align: center;
-  }
-  
+}
+
+/* Efecto hover sutil para la tarjeta */
+.register-card:hover {
+  transform: scale(1.02);
+  transition: transform 0.3s ease-in-out;
+}

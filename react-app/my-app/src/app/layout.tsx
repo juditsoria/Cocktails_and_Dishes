@@ -21,7 +21,9 @@ const geistMono = Geist_Mono({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const shouldShowNavbar = pathname !== '/';
+  const noNavbarRoutes = ['/login', '/register', '/'];
+  const shouldShowNavbar = !noNavbarRoutes.includes(pathname);
+  
 
   return (
     <html lang="es">
