@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, Blueprint
 import db
-from models import User, Cocktail, Dish, Favorite, Pairing
+from models import User, Cocktail, Dish, Favorite, Pairing, Post
 from werkzeug.security import generate_password_hash
 import logging
 import cloudinary.uploader
@@ -9,6 +9,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import JWTManager
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
+from sqlalchemy.orm import joinedload
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -487,6 +488,110 @@ def delete_pairing(pairing_id):
     db.session.commit()
 
     return jsonify({"mensaje": "Emparejamiento eliminado correctamente"}), 200
+
+@api.route("/post", methods=["GET"])
+def get_posts():
+    try:
+        # Usamos joinedload para cargar el usuario asociado al post
+        posts = db.session.query(Post).options(joinedload(Post.user)).all()
+        return jsonify([post.serialize() for post in posts])
+    except Exception as e:
+        return jsonify({"Error": f"Error al obtener los posts: {str(e)}"}), 500
+
+
+
+
+@api.route("/post/<int:post_id>", methods=["GET"])
+def get_post(post_id):
+    # Usamos db.session.query y get() en lugar de get_or_404 (puedes implementarlo si lo deseas)
+    post = db.session.query(Post).get(post_id)
+    if not post:
+        return jsonify({"Error": "Post no encontrado."}), 404
+    return jsonify(post.serialize()), 200
+
+
+
+
+@api.route("/post", methods=["POST"])
+def create_post():
+    data = request.json
+    if not data:
+        return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
+    
+    content = data.get("content")
+    user_id = data.get("user_id")
+    
+    if not content or not user_id:
+        return jsonify({"Error": "Faltan campos requeridos (content, user_id)."}), 400
+    
+    new_post = Post(
+        content=content,
+        user_id=user_id
+    )
+    
+    try:
+        db.session.add(new_post)
+        db.session.commit()
+        return jsonify(new_post.serialize()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"Error": str(e)}), 500
+
+
+@api.route("/post/<int:post_id>", methods=["PUT"])
+def update_post(post_id):
+    data = request.json
+    if not data:
+        return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
+    
+    # Usamos db.session.query para obtener el post
+    post = db.session.query(Post).get(post_id)
+    if not post:
+        return jsonify({"Error": "Post no encontrado."}), 404
+    
+    # Actualizamos solo el contenido, ya que no existe 'title'
+    post.content = data.get("content", post.content)
+    
+    try:
+        db.session.commit()
+        return jsonify({"Success": "Post actualizado correctamente."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"Error": str(e)}), 500
+
+    data = request.json
+    if not data:
+        return jsonify({"Error": "No se proporcionaron datos de entrada."}), 400
+    
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({"Error": "Post no encontrado."}), 404
+    
+    post.title = data.get("title", post.title)
+    post.content = data.get("content", post.content)
+    
+    try:
+        db.session.commit()
+        return jsonify({"Success": "Post actualizado correctamente."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"Error": str(e)}), 500
+
+
+@api.route("/post/<int:post_id>", methods=["DELETE"])
+def delete_post(post_id):
+    post = db.session.query(Post).get(post_id)
+    if not post:
+        return jsonify({"Error": "Post no encontrado."}), 404
+    
+    try:
+        db.session.delete(post)
+        db.session.commit()
+        return jsonify({"msg": "Post eliminado correctamente."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"Error": str(e)}), 500
+
 
 if __name__ == '__main__':
     api.run(debug=True)

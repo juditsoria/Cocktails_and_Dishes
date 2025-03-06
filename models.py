@@ -147,6 +147,7 @@ class Post(db.Base):
             "post_id": self.post_id,
             "user_id": self.user_id,
             "content": self.content,
+            "user": {"username": self.user.username} if self.user else None 
         }
 
     def __str__(self):

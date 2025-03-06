@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import "./styles.css";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
   const [email, setEmail] = useState("");
@@ -8,6 +9,7 @@ const RegisterForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +37,7 @@ const RegisterForm = () => {
 
       if (response.ok) {
         alert("Usuario registrado con éxito");
+        router.push("/login");
       } else {
         setError(data.error || "Hubo un error al registrar el usuario.");
       }

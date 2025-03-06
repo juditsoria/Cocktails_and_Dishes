@@ -23,7 +23,7 @@ const Navbar = () => {
             <a className="nav-link" href="/login">Chat</a>
           </li>
           <li className="nav-item active mx-2">
-            <a className="nav-link" href="/login">Comparte tus ideas</a>
+            <a className="nav-link" href="/posts">Comparte tus ideas</a>
           </li>
         </ul>
         <ul className="navbar-nav"> {/* Lista separada para "Cerrar sesión" */}
